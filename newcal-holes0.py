@@ -18,10 +18,16 @@ rightChainTolerance =1.0+0.360479822602/100.0
 
 
 #default cut parameters
-distBetweenCuts12 = 1928.8
-distBetweenCuts34 = 1927.2
-distWorkareaTopToCut5 = 236.536
-bitDiameter = 6.35
+dH0H1 = 10.2873
+dH0H2 = 10.8815
+dH0H3 = 8.8534
+dH0H4 = 9.1677
+dH1H2 = 10.0082
+dH1H4 = 16.9126
+dH2H3 = 17.6358
+dH3H4 = 8.5539
+dH0M5 = 4.4062
+dH2M5 = 9.5685
 
 #optimization parameters
 acceptableTolerance = .05
@@ -40,98 +46,21 @@ adjustMotorSpacing = False
 adjustRotationalRadius = False
 adjustChainCompensation = False
 
-print " -- Machine Parameters During Calibration Cut --"
-x = raw_input ("Enter Motor Spacing in mm (enter for "+str(motorSpacing)+"):")
-if (x <> ""):
-	motorSpacing = float(x)
-x = raw_input ("Enter Height of Motors Above WorkArea in mm (enter for "+str(motorYoffsetEst)+"):")
-if (x <> ""):
-	motorYoffsetEst = float(x)
-x = raw_input ("Enter Rotational Radius in mm (enter for "+str(rotationRadiusEst)+"):")
-if (x <> ""):
-	rotationRadiusEst = float(x)
-x = raw_input ("Enter Chain Sag Correction (enter for "+str(chainSagCorrectionEst)+"):")
-if (x <> ""):
-	chainSagCorrectionEst = float(x)
-x = raw_input ("Enter 1 for Chain Over Sprocket or 0 for Chain Under Sprocket (enter for "+str(chainOverSprocket)+" or [1/0]):")
-if (x <> ""):
-	chainOverSprocket = int(x)
-x = raw_input ("Enter Left Chain Tolerance (enter for "+str((leftChainTolerance-1.0)*100)+"):")
-if (x <> ""):
-	leftChainTolerance = 1+float(x)/100.0
-x = raw_input ("Enter Right Chain Tolerance (enter for "+str((rightChainTolerance-1.0)*100)+"):")
-if (x <> ""):
-	rightChainTolerance = 1+float(x)/100.0
-
-print
-print " -- Cut Measurements --"
-x = raw_input ("Enter Distance Between Cuts 1 and 2 in mm (enter for "+str(distBetweenCuts12)+"):")
-if (x <> ""):
-	distBetweenCuts12 = float(x)
-
-x = raw_input ("Enter Distance Between Cuts 3 and 4 in mm (enter for "+str(distBetweenCuts34)+"):")
-if (x <> ""):
-	distBetweenCuts34 = float(x)
-
-x = raw_input ("Enter Distance From Top of Board to Top of Cut 5 in mm (enter for "+str(distWorkareaTopToCut5)+"):")
-if (x <> ""):
-	distWorkareaTopToCut5 = float(x)
-
-x = raw_input ("Enter Bit Diameter in mm (enter for "+str(bitDiameter)+"):")
-if (x <> ""):
-	bitDiameter = float(x)
-
-
-print
-print " -- Optimization Parameters --"
-
-x = raw_input ("Acceptable Tolerance in mm (enter for "+str(acceptableTolerance)+"):")
-if (x <> ""):
-	acceptableTolerance = float(x)
-
-x = raw_input ("Number of Iterations (enter for "+str(numberOfIterations)+"):")
-if (x <> ""):
-	numberOfIterations = int(x)
-
-x = raw_input ("motorYcoord Correction scale (enter for "+str(motorYcoordCorrectionScale)+"):")
-if (x <> ""):
-	motorYcoordCorrectionScale = float(x)
-
-x = raw_input ("Chain Sag Correction scale (enter for "+str(chainSagCorrectionCorrectionScale)+"):")
-if (x <> ""):
-	chainSagCorrectionCorrectionScale = float(x)
-
-x = raw_input ("Desired Rotational Radius (enter for "+str(desiredRotationalRadius)+"):")
-if (x <> ""):
-	desiredRotationalRadius = float(x)
-
-x = raw_input ("Adjust Rotational Radius (enter for "+str(adjustRotationalRadius)+" or [y/n]):")
-if (x == "y" or (x == "" and adjustRotationalRadius)):
-	adjustRotationalRadius = True
-	x = raw_input ("Rotation Radius Correction scale (enter for "+str(rotationRadiusCorrectionScale)+"):")
-	if x <> "":
-		rotationRadiusCorrectionScale = float(x)
-else:
-	adjustRotationalRadius = False
-
-x = raw_input ("Adjust Motor Spacing (enter for "+str(adjustMotorSpacing)+" or [y/n]):")
-if (x == "y" or ( x=="" and adjustMotorSpacing)):
-	adjustMotorSpacing = True
-	x = raw_input ("Motor Spacing Correction scale (enter for "+str(motorXcoordCorrectionScale)+"):")
-	if x <> "":
-		motorXcoordCorrectionScale = float(x)
-else:
-	adjustMotorSpacing = False
-
 # Gather current machine parameters
-
 motorXcoord = motorSpacing/2
-motorYcoordEst = (workspaceHeight/2) + motorYoffsetEst+.25
+motorYcoordEst = (workspaceHeight/2) + motorYoffsetEst
 sprocketRadius = (gearTeeth*chainPitch / 2.0 / 3.14159 + chainPitch/math.sin(3.14159 / gearTeeth)/2.0)/2.0
-leftChainMaslowMeasuredLength = motorSpacing / leftChainTolerance
-rightChainMaslowMeasuredLength = motorSpacing / rightChainTolerance
 
+#Calculate x,y coordinates for each hole
+H0x = 0
+H0y = 0
+M5x = 0
+M5y = dH0M5
+H2y = (dH0M5*dH0M5+dH0H2*dH0H2+dH2M5*dH2M5)/(2*DH0M5)
+H2x = math.sqrt( (dH0M5+dH0H2+dH2M5) * (dH0M5+dH0H2-dH2M5) * (dH0M5-dH0H2+dH2M5) * (-dH0M5+dH0H2+dH2M5) *))/(2*dH0M5)
+print "H2x:"+str(H2x)+", H2y:"+str(H2y)
 # Calculate the actual chain lengths for each cut location
+x=raw_input("")
 
 MotorDistanceCut1 = math.sqrt(math.pow(motorXcoord - ((workspaceWidth/2)-254),2) + math.pow(motorYcoordEst - ((workspaceHeight/2)-254),2))
 MotorDistanceCut2 = math.sqrt(math.pow(motorXcoord + ((workspaceWidth/2)-254),2) + math.pow(motorYcoordEst - ((workspaceHeight/2)-254),2))
