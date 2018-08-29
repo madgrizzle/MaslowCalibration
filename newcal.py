@@ -1,5 +1,27 @@
 import math
 import random
+import numpy as np
+
+dims = 999
+a= np.arange(dims*dims,dtype=float).reshape(dims,dims)
+b =np.arange(dims, dtype=float)
+counter = 0
+for x in range (0, dims):
+	for y in range (0, dims):
+		a[x,y] = 0.0
+	a[x,counter] = 1
+	if counter != dims-1:
+		a[x,counter+1] = 1
+	else:
+	    a[x,0] = 1
+	counter += 1
+	b[x] = 12.7+float(random.randint(1, 100))/600.0
+	#if ((x == 4)):
+	#	b[x]=12.8
+print a
+print b
+c = np.linalg.solve(a,b)
+print c
 
 workspaceHeight = 1219.2
 workspaceWidth = 2438.4
@@ -8,10 +30,10 @@ chainPitch = 6.35
 
 
 #default parameters used during calibration cut
-motorSpacing = 3602.6
+motorSpacing = 3000.0#3602.6
 motorYoffsetEst = 468.4
 rotationRadiusEst = 133
-chainSagCorrectionEst = 27.394023
+chainSagCorrectionEst = 54.0 #27.394023
 chainOverSprocket = 1
 leftChainTolerance = 1.0+0.347900203615/100.0
 rightChainTolerance =1.0+0.360479822602/100.0
@@ -172,7 +194,7 @@ ChainSag2 = (1 + ((chainSagCorrectionEst / 1000000000000) * math.pow(math.cos(Ch
 ChainSag3 = (1 + ((chainSagCorrectionEst / 1000000000000) * math.pow(math.cos(ChainAngleCut3),2) * math.pow(ChainStraightCut3,2) * math.pow((math.tan(ChainAngleCut4) * math.cos(ChainAngleCut3)) + math.sin(ChainAngleCut3),2)))
 ChainSag4 = (1 + ((chainSagCorrectionEst / 1000000000000) * math.pow(math.cos(ChainAngleCut4),2) * math.pow(ChainStraightCut4,2) * math.pow((math.tan(ChainAngleCut3) * math.cos(ChainAngleCut4)) + math.sin(ChainAngleCut4),2)))
 
-print "ChainSag1: "+str(round((ChainSag1-1)*ChainStraightCut1,6)) + "ChainSag2: "+str(round((ChainSag2-1)*ChainStraightCut2,6)) +"ChainSag3: "+str(round((ChainSag3-1)*ChainStraightCut3,6)) +"ChainSag4: "+str(round((ChainSag4-1)*ChainStraightCut4,6))
+print "ChainSag1: "+str(round((ChainSag1-1.0)*ChainStraightCut1,6)) + "ChainSag2: "+str(round((ChainSag2-1.0)*ChainStraightCut2,6)) +"ChainSag3: "+str(round((ChainSag3-1.0)*ChainStraightCut3,6)) +"ChainSag4: "+str(round((ChainSag4-1.0)*ChainStraightCut4,6))
 x=raw_input("")
 #Calculate total chain lengths accounting for sprocket geometry and chain sag
 LChainLengthCut1 = (ChainAroundSprocketCut1 + ChainStraightCut1*ChainSag1*leftChainTolerance)-rotationRadiusEst

@@ -18,12 +18,11 @@ aH4y = aH1y
 #default parameters used during calibration cut
 motorSpacing = 3602.6
 motorYoffsetEst = 468.4
-rotationRadiusEst = 133
-chainSagCorrectionEst = 27.394023
+rotationRadiusEst = 139.1
+chainSagCorrectionEst = 35.0
 chainOverSprocket = 1
 leftChainTolerance = 1.0+0.347900203615/100.0
 rightChainTolerance =1.0+0.360479822602/100.0
-
 
 #default cut parameters
 dH0H1 = 1028.6216
@@ -50,9 +49,9 @@ desiredRotationalRadius = rotationRadiusEst #
 #optional adjustments
 adjustmotorYcoord = True
 adjustChainSag = True
-adjustMotorSpacing = False
-adjustRotationalRadius = False
-adjustChainCompensation = False
+adjustMotorSpacing = True
+adjustRotationalRadius = True
+adjustChainCompensation = True
 
 # Gather current machine parameters
 motorXcoord = motorSpacing/2
@@ -317,7 +316,7 @@ while(errorMagnitude > acceptableTolerance and n < numberOfIterations):
 			print "  RChain Error Hole 1: " + str(round(bestRChainErrorHole1,4)) + ", RChain Error Hole 2: " + str(round(bestRChainErrorHole2,4)) + ", RChain Error Hole 3: " + str(round(bestRChainErrorHole3,4)) + ", RChain Error Hole 4: " + str(round(bestRChainErrorHole4,4))
 
 	#pick a random variable to adjust
-	x = raw_input("")
+	#x = raw_input("")
 
 	direction = random.randint(0,1)
 	adjustValue = random.randint(1, 100)
@@ -346,28 +345,27 @@ while(errorMagnitude > acceptableTolerance and n < numberOfIterations):
 			rightChainToleranceEst += errorMagnitude*chainCompensationCorrectionScale*tscaleMultiplier
 			Completed = True
 
-	if (rotationRadiusEst<desiredRotationalRadius-2):
-		rotationRadiusEst = desiredRotationalRadius-2
-	if (rotationRadiusEst>desiredRotationalRadius+2):
-		rotationRadiusEst = desiredRotationalRadius+2
-	if (motorXcoordEst<motorXcoord-2):
-		motorXcoordEst = motorXcoord - 2
-	if (motorXcoordEst>motorXcoord+2):
-		motorXcoordEst = motorXcoord +2
-	if (chainSagCorrectionEst < 10):
-		chainSagCorrectionEst = 10
-	if (chainSagCorrectionEst > 60):
-		chainSagCorrectionEst = 60
-	if (leftChainToleranceEst > 1.006):
-		leftChainToleranceEst = 1.006
-	if (leftChainToleranceEst < 1.001):
-		leftChainToleranceEst = 1.001
-	if (rightChainToleranceEst > 1.006):
-		rightChainToleranceEst = 1.006
-	if (rightChainToleranceEst < 1.001):
-		rightChainToleranceEst = 1.001
-
-
+	if (False):
+		if (rotationRadiusEst<desiredRotationalRadius-2):
+			rotationRadiusEst = desiredRotationalRadius-2
+		if (rotationRadiusEst>desiredRotationalRadius+2):
+			rotationRadiusEst = desiredRotationalRadius+2
+		if (motorXcoordEst<motorXcoord-2):
+			motorXcoordEst = motorXcoord - 2
+		if (motorXcoordEst>motorXcoord+2):
+			motorXcoordEst = motorXcoord +2
+		if (chainSagCorrectionEst < 10):
+			chainSagCorrectionEst = 10
+		if (chainSagCorrectionEst > 60):
+			chainSagCorrectionEst = 60
+		if (leftChainToleranceEst > 1.006):
+			leftChainToleranceEst = 1.006
+		if (leftChainToleranceEst < 1.001):
+			leftChainToleranceEst = 1.001
+		if (rightChainToleranceEst > 1.006):
+			rightChainToleranceEst = 1.006
+		if (rightChainToleranceEst < 1.001):
+			rightChainToleranceEst = 1.001
 
 
 
