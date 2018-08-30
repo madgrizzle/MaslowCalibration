@@ -256,9 +256,20 @@ while(errorMagnitude > acceptableTolerance and n < numberOfIterations):
 			bestRChainErrorHole4 = RChainErrorHole4
 
 			#report better findings
-			distanceBetweenMotors = math.sqrt( math.pow(leftMotorXEst-rightMotorXEst,2)+math.pow(leftMotorYEst-rightMotorYEst,2))
+			distBetweenMotors = math.sqrt( math.pow(leftMotorXEst-rightMotorXEst,2)+math.pow(leftMotorYEst-rightMotorYEst,2))
+			motorTilt = math.atan((rightMotorYEst-leftMotorYEst)/(rightMotorXEst-leftMotorXEst))*180.0/3.141592
 			print "---------------------------------------------------------------------------------------------"
-			print "N: " + str(n) + ", Error Magnitude: " + str(round(bestErrorMagnitude, 3)) + ", MotorSpacingX: "+str(distanceBetweenMotors)+", Rotation Disk Radius: " + str(round(bestrotationRadiusEst, 3)) + ", Chain Sag Correction Value: " + str(round(bestchainSagCorrectionEst, 6)) + ", Left Chain:"+str(round(bestleftChainToleranceEst,7))+", Right Chain:"+str(round(bestrightChainToleranceEst,7))
+			print "N: " + str(n) + ", Error Magnitude: " + str(round(bestErrorMagnitude, 3))
+			print "Motor Spacing: "+str(distBetweenMotors) + ", Motor Elevation: "+str(bestleftMotorYEst)+", Top Beam Tilt: "+str(motorTilt) +" degrees"
+			tleftMotorX = math.cos(motorTilt)*distBetweenMotors/-2.0
+			tleftMotorY = leftMotorYEst
+			trightMotorX = math.cos(motorTilt)*distBetweenMotors+tleftMotorX
+			trightMotorY = math.sin(motorTilt)*distBetweenMotors+tleftMotorY
+			print "tleftMotorX: "+str(tleftMotorX) + ", tleftMotorY: "+str(tleftMotorY)
+			print "trightMotorX: "+str(trightMotorX)+", trightMotorY:"+str(trightMotorY)
+			print "tmotorspacing: "+str(math.sqrt( math.pow(tleftMotorX-trightMotorX,2)+math.pow(tleftMotorY-trightMotorY,2)))
+
+			print "Rotation Disk Radius: " + str(round(bestrotationRadiusEst, 3)) + ", Chain Sag Correction Value: " + str(round(bestchainSagCorrectionEst, 6)) + ", Left Chain:"+str(round(bestleftChainToleranceEst,7))+", Right Chain:"+str(round(bestrightChainToleranceEst,7))
 			print "leftMotorX: "+str(bestleftMotorXEst) + ", leftMotorY: "+str(bestleftMotorYEst)
 			print "rightMotorX: "+str(bestrightMotorXEst)+", rightMotorY:"+str(bestrightMotorYEst)
 			print "  LChain Error Hole 1: " + str(round(bestLChainErrorHole1,4)) + ", LChain Error Hole 2: " + str(round(bestLChainErrorHole2,4)) + ", LChain Error Hole 3: " + str(round(bestLChainErrorHole3,4)) + ", LChain Error Hole 4: " + str(round(bestLChainErrorHole4,4))
