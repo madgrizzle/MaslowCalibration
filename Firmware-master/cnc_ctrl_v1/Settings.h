@@ -78,8 +78,8 @@ typedef struct {  // I think this is about ~128 bytes in size if I counted corre
   float chainSagCorrection;
   byte chainOverSprocket;
   byte fPWM;
-  float distPerRotLeftChainTolerance; // unused
-  float distPerRotRightChainTolerance; // unused
+  float leftChainTolerance;
+  float rightChainTolerance;
   float sprocketRadius;
   float positionErrorLimit;
   float topBeamTilt;
