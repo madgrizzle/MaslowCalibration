@@ -101,10 +101,8 @@ void settingsReset() {
     sysSettings.chainSagCorrection = 0.0;  // float chainSagCorrection;
     sysSettings.chainOverSprocket = 1;   // byte chainOverSprocket;
     sysSettings.fPWM = 3;   // byte fPWM;
-    sysSettings.distPerRotLeftChainTolerance = 63.5;    // float distPerRotLeftChainTolerance;
-    sysSettings.distPerRotRightChainTolerance = 63.5;    // float distPerRotRightChainTolerance;
-    sysSettings.leftChainDecompensation = 1.0;
-    sysSettings.rightChainDecompensation = 1.0;
+    sysSettings.leftChainTolerance = 1.0;
+    sysSettings.rightChainTolerance = 1.0;
     sysSettings.sprocketRadius = 10.19043;
     sysSettings.positionErrorLimit = 2.0;  // float positionErrorLimit;
     sysSettings.topBeamTilt = 0;
