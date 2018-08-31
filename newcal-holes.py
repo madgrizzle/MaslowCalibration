@@ -114,21 +114,22 @@ dH2M5 = 1070.0-101.0
 
 #optimization parameters.. this really does affect how well you can arrive at a solution and how good of a solution it is
 acceptableTolerance = .05
-numberOfIterations = 1000000
+numberOfIterations = 10000000
 motorYcoordCorrectionScale = 0.01
 motorXcoordCorrectionScale = 0.05
 chainSagCorrectionCorrectionScale = 0.01
-motorXcoordCorrectionScale = 0.001
-rotationRadiusCorrectionScale = 0.001
+motorSpacingCorrectionScale = 0.001
+rotationRadiusCorrectionScale = 0.01
 chainCompensationCorrectionScale = 0.003
 
 #optional adjustments
 adjustMotorYcoord = True  # this allows raising lowering of top beam
 adjustMotorTilt = True  # this allows tilting of top beam
 adjustMotorXcoord = True  # this allows shifting of top beam
+adjustMotorSpacingInterval = 50 #0 means never, 1 means always, 100 means every 100 times there's no improvement
+adjustRotationalRadiusInterval = 0 #0 means never, 1 means always, 100 means every 100 times there's no improvement
+adjustChainCompensationInterval = 10 #0 means never, 1 means always, 100 means every 100 times there's no improvement
 adjustChainSag = True
-adjustRotationalRadius = False
-adjustChainCompensation = True
 
 # Gather current machine parameters
 leftMotorX = motorSpacing/-2.0 #based on current method since gc/firmware doesn't allow for indpendent x,y of motors
@@ -183,10 +184,15 @@ RChainErrorHole4 = acceptableTolerance
 previousErrorMagnitude = 99999999.9
 
 bestErrorMagnitude = 99999999.9
-revertCounter = 0
+reportCounter = 0
+adjustMotorSpacingCounter = 0
+adjustRotationalRadiusCounter = 0
+adjustChainCompensationCoutner = 0
+adjustMotorSpacing = False # just initializing these variables
+adjustRotationalRadius = False # just initializing these variables
+adjustChainCompensation = False # just initializing these variables
 scaleMultiplier = 1.0
 n = 0
-
 print "Iterating for new machine parameters"
 
 # Iterate until error tolerance is achieved or maximum number of iterations occurs
@@ -222,11 +228,22 @@ while(errorMagnitude > acceptableTolerance and n < numberOfIterations):
 		chainSagCorrectionEst = previouschainSagCorrectionEst
 		leftChainToleranceEst = previousleftChainToleranceEst
 		rightChainToleranceEst = previousrightChainToleranceEst
-		revertCounter += 1
-		if revertCounter == 10000:
-			revertCounter = 0 # currently doesn't do anything.  Can use this to make adjustments if process gets stuck
+		adjustMotorSpacingCounter +=1
+		if (adjustMotorSpacingCounter == adjustMotorSpacingInterval):
+			adjustMotorSpacingCounter = 0
+			adjustMotorSpacing = True
+		adjustRotationalRadiusCounter +=1
+		if (adjustRotationalRadiusCounter == adjustRotationalRadiusInterval):
+			adjustRotationalRadiusCounter = 0
+			adjustRotationalRadius = True
+		adjustChainCompensationCounter +=1
+		if (adjustChainCompensationCounter == adjustChainCompensationInterval):
+			adjustChainCompensationCounter = 0
+			adjustChainCompensation = True
 	else:
-		revertCount = 0
+		adjustMotorSpacingCounter = 0
+		adjustRotationalRadiusCounter = 0
+		adjustChainCompensationCounter = 0
 		previousErrorMagnitude = errorMagnitude
 		previousrotationRadiusEst = rotationRadiusEst
 		previouschainSagCorrectionEst = chainSagCorrectionEst
@@ -256,29 +273,32 @@ while(errorMagnitude > acceptableTolerance and n < numberOfIterations):
 			bestRChainErrorHole4 = RChainErrorHole4
 
 			#report better findings
-			distBetweenMotors = math.sqrt( math.pow(bestleftMotorXEst-bestrightMotorXEst,2)+math.pow(bestleftMotorYEst-bestrightMotorYEst,2))
-			motorTilt = math.atan((bestrightMotorYEst-bestleftMotorYEst)/(bestrightMotorXEst-bestleftMotorXEst))*180.0/3.141592
-			print "---------------------------------------------------------------------------------------------"
-			print "N: " + str(n) + ", Error Magnitude: " + str(round(bestErrorMagnitude, 3))
-			print "Motor Spacing: "+str(distBetweenMotors) + ", Motor Elevation: "+str((workspaceHeight/2.0+(bestleftMotorYEst+(bestrightMotorYEst-bestleftMotorYEst)/2.0))*-1.0)+", Top Beam Tilt: "+str(motorTilt) +" degrees"
-			tleftMotorX = math.cos(motorTilt*3.141592/180.0)*distBetweenMotors/-2.0 + (bestrightMotorXEst+bestleftMotorXEst)/2.0
-			tleftMotorY = math.sin(motorTilt*3.141592/180.0)*distBetweenMotors/-2.0 + bestleftMotorYEst + (bestrightMotorYEst-bestleftMotorYEst)/2.0
-			trightMotorX = math.cos(motorTilt*3.141592/180.0)*distBetweenMotors+tleftMotorX
-			trightMotorY = math.sin(motorTilt*3.141592/180.0)*distBetweenMotors/2.0 + bestleftMotorYEst + (bestrightMotorYEst-bestleftMotorYEst)/2.0
-			print "tleftMotorX: "+str(tleftMotorX) + ", tleftMotorY: "+str(tleftMotorY)
-			print "trightMotorX: "+str(trightMotorX)+", trightMotorY:"+str(trightMotorY)
-			print "tmotorspacing: "+str(math.sqrt( math.pow(tleftMotorX-trightMotorX,2)+math.pow(tleftMotorY-trightMotorY,2)))
+			reportCounter += 1
+			if (reportCounter == 1000):
+				reportCounter = 0
+				distBetweenMotors = math.sqrt( math.pow(bestleftMotorXEst-bestrightMotorXEst,2)+math.pow(bestleftMotorYEst-bestrightMotorYEst,2))
+				motorTilt = math.atan((bestrightMotorYEst-bestleftMotorYEst)/(bestrightMotorXEst-bestleftMotorXEst))*180.0/3.141592
+				print "---------------------------------------------------------------------------------------------"
+				print "Best so far at N: " + str(n) + ", Error Magnitude: " + str(round(bestErrorMagnitude, 3))
+				print "Motor Spacing: "+str(distBetweenMotors) + ", Motor Elevation: "+str((workspaceHeight/2.0+(bestleftMotorYEst+(bestrightMotorYEst-bestleftMotorYEst)/2.0))*-1.0)+", Top Beam Tilt: "+str(motorTilt) +" degrees"
+				tleftMotorX = math.cos(motorTilt*3.141592/180.0)*distBetweenMotors/-2.0 + (bestrightMotorXEst+bestleftMotorXEst)/2.0
+				tleftMotorY = math.sin(motorTilt*3.141592/180.0)*distBetweenMotors/-2.0 + bestleftMotorYEst + (bestrightMotorYEst-bestleftMotorYEst)/2.0
+				trightMotorX = math.cos(motorTilt*3.141592/180.0)*distBetweenMotors+tleftMotorX
+				trightMotorY = math.sin(motorTilt*3.141592/180.0)*distBetweenMotors/2.0 + bestleftMotorYEst + (bestrightMotorYEst-bestleftMotorYEst)/2.0
+				print "tleftMotorX: "+str(tleftMotorX) + ", tleftMotorY: "+str(tleftMotorY)
+				print "trightMotorX: "+str(trightMotorX)+", trightMotorY:"+str(trightMotorY)
+				print "tmotorspacing: "+str(math.sqrt( math.pow(tleftMotorX-trightMotorX,2)+math.pow(tleftMotorY-trightMotorY,2)))
 
-			print "Rotation Disk Radius: " + str(round(bestrotationRadiusEst, 3)) + ", Chain Sag Correction Value: " + str(round(bestchainSagCorrectionEst, 6)) + ", Left Chain:"+str(round(bestleftChainToleranceEst,7))+", Right Chain:"+str(round(bestrightChainToleranceEst,7))
-			print "leftMotorX: "+str(bestleftMotorXEst) + ", leftMotorY: "+str(bestleftMotorYEst)
-			print "rightMotorX: "+str(bestrightMotorXEst)+", rightMotorY:"+str(bestrightMotorYEst)
-			print "  LChain Error Hole 1: " + str(round(bestLChainErrorHole1,4)) + ", LChain Error Hole 2: " + str(round(bestLChainErrorHole2,4)) + ", LChain Error Hole 3: " + str(round(bestLChainErrorHole3,4)) + ", LChain Error Hole 4: " + str(round(bestLChainErrorHole4,4))
-			print "  RChain Error Hole 1: " + str(round(bestRChainErrorHole1,4)) + ", RChain Error Hole 2: " + str(round(bestRChainErrorHole2,4)) + ", RChain Error Hole 3: " + str(round(bestRChainErrorHole3,4)) + ", RChain Error Hole 4: " + str(round(bestRChainErrorHole4,4))
-			print "  RMS Error Hole 1: "+str(round(math.sqrt(math.pow(bestLChainErrorHole1,2)+math.pow(bestRChainErrorHole1,2)),4))
-			print "  RMS Error Hole 2: "+str(round(math.sqrt(math.pow(bestLChainErrorHole2,2)+math.pow(bestRChainErrorHole2,2)),4))
-			print "  RMS Error Hole 3: "+str(round(math.sqrt(math.pow(bestLChainErrorHole3,2)+math.pow(bestRChainErrorHole3,2)),4))
-			print "  RMS Error Hole 4: "+str(round(math.sqrt(math.pow(bestLChainErrorHole4,2)+math.pow(bestRChainErrorHole4,2)),4))
-			#x = raw_input("")
+				print "Rotation Disk Radius: " + str(round(bestrotationRadiusEst, 3)) + ", Chain Sag Correction Value: " + str(round(bestchainSagCorrectionEst, 6)) + ", Left Chain:"+str(round(bestleftChainToleranceEst,7))+", Right Chain:"+str(round(bestrightChainToleranceEst,7))
+				print "leftMotorX: "+str(bestleftMotorXEst) + ", leftMotorY: "+str(bestleftMotorYEst)
+				print "rightMotorX: "+str(bestrightMotorXEst)+", rightMotorY:"+str(bestrightMotorYEst)
+				print "  LChain Error Hole 1: " + str(round(bestLChainErrorHole1,4)) + ", LChain Error Hole 2: " + str(round(bestLChainErrorHole2,4)) + ", LChain Error Hole 3: " + str(round(bestLChainErrorHole3,4)) + ", LChain Error Hole 4: " + str(round(bestLChainErrorHole4,4))
+				print "  RChain Error Hole 1: " + str(round(bestRChainErrorHole1,4)) + ", RChain Error Hole 2: " + str(round(bestRChainErrorHole2,4)) + ", RChain Error Hole 3: " + str(round(bestRChainErrorHole3,4)) + ", RChain Error Hole 4: " + str(round(bestRChainErrorHole4,4))
+				print "  RMS Error Hole 1: "+str(round(math.sqrt(math.pow(bestLChainErrorHole1,2)+math.pow(bestRChainErrorHole1,2)),4))
+				print "  RMS Error Hole 2: "+str(round(math.sqrt(math.pow(bestLChainErrorHole2,2)+math.pow(bestRChainErrorHole2,2)),4))
+				print "  RMS Error Hole 3: "+str(round(math.sqrt(math.pow(bestLChainErrorHole3,2)+math.pow(bestRChainErrorHole3,2)),4))
+				print "  RMS Error Hole 4: "+str(round(math.sqrt(math.pow(bestLChainErrorHole4,2)+math.pow(bestRChainErrorHole4,2)),4))
+				#x = raw_input("")
 
 	#pick a random variable to adjust
 	#direction = random.randint(0,1)  # determine if its an increase or decrease
@@ -288,7 +308,7 @@ while(errorMagnitude > acceptableTolerance and n < numberOfIterations):
 		picked = random.randint(1,6)
 		tscaleMultiplier = scaleMultiplier * float(adjustValue)/100.0 #avoid altering scaleMultiplier
 		if (picked == 1):
-			motor = random.randint(0,2) #pick which motor (or both) to adjust
+			motor = random.randint(0,3) #pick which motor (or both) to adjust
 			if (motor == 0 and adjustMotorTilt): #tilt left motor up or down
 				leftMotorYEst += motorYcoordCorrectionScale*tscaleMultiplier
 				# because left motor mover, change x coordinate of right motor to keep distance between motors fixed
@@ -303,6 +323,14 @@ while(errorMagnitude > acceptableTolerance and n < numberOfIterations):
 				leftMotorYEst += motorYcoordCorrectionScale*tscaleMultiplier
 				rightMotorYEst += motorYcoordCorrectionScale*tscaleMultiplier
 				Completed = True
+			if (motor ==3 and adjustMotorSpacing):
+				desiredMotorSpacing += motorSpacingCorrectionScale*tscaleMultiplier
+				adjustMotorSpacing=False
+				motor = random.randint(0,1)
+				if (motor == 0):
+					leftMotorXEst = rightMotorXEst - math.sqrt(math.pow(desiredMotorSpacing,2) - math.pow((rightMotorYEst-leftMotorYEst),2))
+				else:
+					rightMotorXEst = leftMotorXEst - math.sqrt(math.pow(desiredMotorSpacing,2) - math.pow((leftMotorYEst-rightMotorYEst),2))
 		if (picked == 2 and adjustMotorXcoord): #all x moves are in unison to keep distance between motors fixed
 			leftMotorXEst += errorMagnitude*motorXcoordCorrectionScale*tscaleMultiplier
 			rightMotorXEst += errorMagnitude*motorXcoordCorrectionScale*tscaleMultiplier
@@ -311,19 +339,24 @@ while(errorMagnitude > acceptableTolerance and n < numberOfIterations):
 			chainSagCorrectionEst += errorMagnitude*chainSagCorrectionCorrectionScale*tscaleMultiplier
 			Completed = True
 		if (picked == 4 and adjustRotationalRadius): #recommend against this one if at all possible
-			rotationRadiusEst += errorMagnitude*rotationRadiusCorrectionScale*tscaleMultiplier
+			rotationRadiusEst -= errorMagnitude*rotationRadiusCorrectionScale*tscaleMultiplier
+			adjustRotationalRadius = False
 			Completed = True
 		if (picked == 5 and adjustChainCompensation):
 			leftChainToleranceEst += errorMagnitude*chainCompensationCorrectionScale*tscaleMultiplier
+			rotationRadiusEst -= errorMagnitude*rotationRadiusCorrectionScale*tscaleMultiplier
 			#make sure chain tolerance doesn't go over 1 (i.e., chain is shorter than should be.. this can cause optimization to go bonkers)
 			if (leftChainToleranceEst>= 1.0):
 				leftChainToleranceEst = 1.0
+			adjustChainCompensation = False
 			Completed = True
 		if (picked == 6 and adjustChainCompensation):
 			rightChainToleranceEst += errorMagnitude*chainCompensationCorrectionScale*tscaleMultiplier
+			rotationRadiusEst -= errorMagnitude*rotationRadiusCorrectionScale*tscaleMultiplier #counteract chain tolerance some
 			#make sure chain tolerance doesn't go over 1 (i.e., chain is shorter than should be.. this can cause optimization to go bonkers)
 			if (rightChainToleranceEst>= 1.0):
 				rightChainToleranceEst = 1.0
+			adjustChainCompensation = False
 			Completed = True
 
 	#make sure values aren't too far out of whack.
@@ -356,9 +389,15 @@ motorTilt = math.atan((bestrightMotorYEst-bestleftMotorYEst)/(bestrightMotorXEst
 print "Top Beam Tilt: "+str(round(motorTilt,7))
 print "Rotation Radius for Triangular Kinematics: " + str(round(bestrotationRadiusEst, 4))
 print "Chain Sag Correction Value for Triangular Kinematics: " + str(round(bestchainSagCorrectionEst, 6))
-
-
 print "---------------------------------------------------------------------------------------------"
+print "Error Magnitude: " + str(round(bestErrorMagnitude, 3))
+print "  LChain Error Hole 1: " + str(round(bestLChainErrorHole1,4)) + ", LChain Error Hole 2: " + str(round(bestLChainErrorHole2,4)) + ", LChain Error Hole 3: " + str(round(bestLChainErrorHole3,4)) + ", LChain Error Hole 4: " + str(round(bestLChainErrorHole4,4))
+print "  RChain Error Hole 1: " + str(round(bestRChainErrorHole1,4)) + ", RChain Error Hole 2: " + str(round(bestRChainErrorHole2,4)) + ", RChain Error Hole 3: " + str(round(bestRChainErrorHole3,4)) + ", RChain Error Hole 4: " + str(round(bestRChainErrorHole4,4))
+print "  RMS Error Hole 1: "+str(round(math.sqrt(math.pow(bestLChainErrorHole1,2)+math.pow(bestRChainErrorHole1,2)),4))
+print "  RMS Error Hole 2: "+str(round(math.sqrt(math.pow(bestLChainErrorHole2,2)+math.pow(bestRChainErrorHole2,2)),4))
+print "  RMS Error Hole 3: "+str(round(math.sqrt(math.pow(bestLChainErrorHole3,2)+math.pow(bestRChainErrorHole3,2)),4))
+print "  RMS Error Hole 4: "+str(round(math.sqrt(math.pow(bestLChainErrorHole4,2)+math.pow(bestRChainErrorHole4,2)),4))
+
 
 x="n"
 while (x<>"x"):
