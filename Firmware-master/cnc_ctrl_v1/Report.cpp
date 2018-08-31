@@ -21,12 +21,12 @@ Copyright 2014-2017 Bar Smith*/
 
 void  reportStatusMessage(byte status_code){
     /*
-    
+
     Sends confirmation protocol response for commands. For every incoming line,
     this method responds with an 'ok' for a successful command or an 'error:'
     to indicate some error event with the line or some critical system error during
     operation.
-    
+
     Taken from Grbl http://github.com/grbl/grbl
     */
     if (status_code == 0) { // STATUS_OK
@@ -179,10 +179,10 @@ void reportMaslowSettings() {
     Serial.print(F("$37=")); Serial.println(sysSettings.chainSagCorrection, 8);
     Serial.print(F("$38=")); Serial.println(sysSettings.chainOverSprocket);
     Serial.print(F("$39=")); Serial.println(sysSettings.fPWM);
-    Serial.print(F("$40=")); Serial.println(sysSettings.distPerRotLeftChainTolerance, 8);
-    Serial.print(F("$41=")); Serial.println(sysSettings.distPerRotRightChainTolerance, 8);
+    Serial.print(F("$40=")); Serial.println(sysSettings.leftChainTolerance, 8);
+    Serial.print(F("$41=")); Serial.println(sysSettings.rightChainTolerance, 8);
     Serial.print(F("$42=")); Serial.println(sysSettings.positionErrorLimit, 8);
-    
+
   #else
     Serial.print(F("$0=")); Serial.print(sysSettings.machineWidth);
     Serial.print(F(" (machine width, mm)\r\n$1=")); Serial.print(sysSettings.machineHeight, 8);
@@ -223,17 +223,21 @@ void reportMaslowSettings() {
     Serial.print(F(" (z axis Velocity proportional weight)\r\n$37=")); Serial.print(sysSettings.chainSagCorrection, 8);
     Serial.print(F(" (chain sag correction value)\r\n$38=")); Serial.print(sysSettings.chainOverSprocket);
     Serial.print(F(" (chain over sprocket)\r\n$39=")); Serial.print(sysSettings.fPWM);
-    Serial.print(F(" (PWM frequency value 1=39,000Hz, 2=4,100Hz, 3=490Hz)\r\n$40=")); Serial.print(sysSettings.distPerRotLeftChainTolerance, 8);
-    Serial.print(F(" (distance / rotation, including chain tolerance, left chain, mm)\r\n$41=")); Serial.print(sysSettings.distPerRotRightChainTolerance, 8);
-    Serial.print(F(" (distance / rotation, including chain tolerance, right chain, mm)\r\n$42=")); Serial.print(sysSettings.positionErrorLimit, 8);
-    Serial.print(F(" (position error alarm limit, mm)"));
+    Serial.print(F(" (PWM frequency value 1=39,000Hz, 2=4,100Hz, 3=490Hz)\r\n$40=")); Serial.print(sysSettings.leftChainTolerance, 8);
+    Serial.print(F(" (left chain tolerance, percent)\r\n$41=")); Serial.print(sysSettings.rightChainTolerance, 8);
+    Serial.print(F(" (right chain tolerance, percent)\r\n$42=")); Serial.print(sysSettings.positionErrorLimit, 8);
+    Serial.print(F(" (position error alarm limit, mm\r\n)")); Serial.print(sysSettings.leftMotorX, 4);
+    Serial.print(F(" (left motor X coordinate, mm\r\n)")); Serial.print(sysSettings.leftMotorY, 4);
+    Serial.print(F(" (left motor Y coordinate, mm\r\n)")); Serial.print(sysSettings.rightMotorX, 4);
+    Serial.print(F(" (right motor X coordinate, mm\r\n)")); Serial.print(sysSettings.rightMotorY, 4);
+    Serial.print(F(" (right motor Y coordinate, mm\r\n)"));
     Serial.println();
   #endif
 }
 
 void  returnError(){
     /*
-    Prints the machine's positional error and the amount of space available in the 
+    Prints the machine's positional error and the amount of space available in the
     gcode buffer
     */
         Serial.print(F("[PE:"));
@@ -255,15 +259,15 @@ void  returnError(){
 void  returnPoz(){
     /*
     Causes the machine's position (x,y) to be sent over the serial connection updated on the UI
-    in Ground Control. Also causes the error report to be sent. Only executes 
+    in Ground Control. Also causes the error report to be sent. Only executes
     if hasn't been called in at least POSITIONTIMEOUT ms.
     */
-    
+
     static unsigned long lastRan = millis();
-    
+
     if (millis() - lastRan > POSITIONTIMEOUT){
-        
-        
+
+
         Serial.print(F("<"));
         if (sys.stop){
             Serial.print(F("Stop,MPos:"));
@@ -280,13 +284,13 @@ void  returnPoz(){
         Serial.print(F(","));
         Serial.print(zAxis.read()/sys.inchesToMMConversion);
         Serial.println(F(",WPos:0.000,0.000,0.000>"));
-        
-        
+
+
         returnError();
-        
+
         lastRan = millis();
     }
-    
+
 }
 
 void  reportMaslowHelp(){

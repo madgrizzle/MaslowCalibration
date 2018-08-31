@@ -214,17 +214,17 @@ void  Kinematics::triangularInverse(float xTarget,float yTarget, float* aChainLe
     //Calculate the chain angles from horizontal, based on if the chain connects to the sled from the top or bottom of the sprocket
     if(sysSettings.chainOverSprocket == 1){
         leftChainAngle = (asin((sysSettings.leftMotorY - yTarget)/leftMotorDistance) + asin(sysSettings.sprocketRadius/leftMotorDistance))*-1.0;
-        rightChainAngle = (asin((sysSettings.rightMotorY - yTarget)/leftMotorDistance) + asin(sysSettings.sprocketRadius/rightMotorDistance))*-1.0;
+        rightChainAngle = (asin((sysSettings.rightMotorY - yTarget)/rightMotorDistance) + asin(sysSettings.sprocketRadius/rightMotorDistance))*-1.0;
 
         leftChainAroundSprocket = sysSettings.sprocketRadius * leftChainAngle;
         rightChainAroundSprocket = sysSettings.sprocketRadius * rightChainAngle;
     }
     else{
         leftChainAngle = (asin((sysSettings.leftMotorY - yTarget)/leftMotorDistance) - asin(sysSettings.sprocketRadius/rightMotorDistance))*-1.0;
-        rightChainAngle = (asin((sysSettings.rightMotorY - yTarget)/leftMotorDistance) - asin(sysSettings.sprocketRadius/rightMotorDistance))*-1.0;
+        rightChainAngle = (asin((sysSettings.rightMotorY - yTarget)/rightMotorDistance) - asin(sysSettings.sprocketRadius/rightMotorDistance))*-1.0;
 
         leftChainAroundSprocket = sysSettings.sprocketRadius * (3.14159 - leftChainAngle);
-        rightChainAroundSprocket = sysSettings.sprocketRadius * (3.14159 - leftChain2Angle);
+        rightChainAroundSprocket = sysSettings.sprocketRadius * (3.14159 - rightChainAngle);
     }
 
     //Calculate the straight chain length from the sprocket to the bit
@@ -236,8 +236,8 @@ void  Kinematics::triangularInverse(float xTarget,float yTarget, float* aChainLe
     rightChainStraight *= (1 + ((sysSettings.chainSagCorrection / 1000000000000) * pow(cos(rightChainAngle),2) * pow(rightChainStraight,2) * pow((tan(leftChainAngle) * cos(rightChainAngle)) + sin(rightChainAngle),2)));
 
     //Calculate total chain lengths accounting for sprocket geometry and chain sag
-    float leftChain = leftChainAroundSprocket + leftChainStraight * leftChainTolerance;
-    float rightChain = rightChainAroundSprocket + rightChainStraight * rightChainTolerance;
+    float leftChain = leftChainAroundSprocket + leftChainStraight * sysSettings.leftChainTolerance;
+    float rightChain = rightChainAroundSprocket + rightChainStraight * sysSettings.rightChainTolerance;
 
     //Subtract of the virtual length which is added to the chain by the rotation mechanism
     leftChain = leftChain - sysSettings.rotationDiskRadius;

@@ -260,11 +260,11 @@ while(errorMagnitude > acceptableTolerance and n < numberOfIterations):
 			motorTilt = math.atan((rightMotorYEst-leftMotorYEst)/(rightMotorXEst-leftMotorXEst))*180.0/3.141592
 			print "---------------------------------------------------------------------------------------------"
 			print "N: " + str(n) + ", Error Magnitude: " + str(round(bestErrorMagnitude, 3))
-			print "Motor Spacing: "+str(distBetweenMotors) + ", Motor Elevation: "+str(bestleftMotorYEst)+", Top Beam Tilt: "+str(motorTilt) +" degrees"
-			tleftMotorX = math.cos(motorTilt)*distBetweenMotors/-2.0
-			tleftMotorY = leftMotorYEst
-			trightMotorX = math.cos(motorTilt)*distBetweenMotors+tleftMotorX
-			trightMotorY = math.sin(motorTilt)*distBetweenMotors+tleftMotorY
+			print "Motor Spacing: "+str(distBetweenMotors) + ", Motor Elevation: "+str(bestleftMotorYEst+(bestrightMotorYEst-bestleftMotorYEst)/2.0)+", Top Beam Tilt: "+str(motorTilt) +" degrees"
+			tleftMotorX = math.cos(motorTilt*3.141592/180.0)*distBetweenMotors/-2.0 + (bestrightMotorXEst+bestleftMotorXEst)/2.0
+			tleftMotorY = math.sin(motorTilt*3.141592/180.0)*distBetweenMotors/-2.0 + bestleftMotorYEst + (bestrightMotorYEst-bestleftMotorYEst)/2.0
+			trightMotorX = math.cos(motorTilt*3.141592/180.0)*distBetweenMotors+tleftMotorX
+			trightMotorY = math.sin(motorTilt*3.141592/180.0)*distBetweenMotors/2.0 + bestleftMotorYEst + (bestrightMotorYEst-bestleftMotorYEst)/2.0
 			print "tleftMotorX: "+str(tleftMotorX) + ", tleftMotorY: "+str(tleftMotorY)
 			print "trightMotorX: "+str(trightMotorX)+", trightMotorY:"+str(trightMotorY)
 			print "tmotorspacing: "+str(math.sqrt( math.pow(tleftMotorX-trightMotorX,2)+math.pow(tleftMotorY-trightMotorY,2)))

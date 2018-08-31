@@ -235,15 +235,15 @@ byte settingsStoreGlobalSetting(const byte& parameter,const float& value){
                       break;
                 case 2:
                       sysSettings.distBetweenMotors = value;
-                      sysSettings.leftMotorX = math.cos(sysSettings.topBeamTilt)*sysSettings.distBetweenMotors/2.0;
-                      sysSettings.leftMotorY = sysSettings.motorOffsetY;
-                      sysSettings.rightMotorX = math.cos(sysSettings.topBeamTilt)*sysSettings.distBetweenMotors+sysSettings.leftMotorX;
-                      sysSettings.rightMotorY = math.sin(sysSettings.topBeamTilt)*sysSettings.distBetweenMotors+sysSettings.motorOffsetY;
+                      sysSettings.leftMotorX = cos(sysSettings.topBeamTilt*0.0174532925199433)*sysSettings.distBetweenMotors/-2.0;
+                      sysSettings.leftMotorY = sin(sysSettings.topBeamTilt*0.0174532925199433)*distBetweenMotors/-2.0 + (sysSettings.motorOffsetY+sysSettings.machineHeight/2.0)*-1.0;
+                      sysSettings.rightMotorX = cos(sysSettings.topBeamTilt*0.0174532925199433)*sysSettings.distBetweenMotors+sysSettings.leftMotorX;
+                      sysSettings.rightMotorY = sin(sysSettings.topBeamTilt*0.0174532925199433)*distBetweenMotors/2.0 + (sysSettings.motorOffsetY+sysSettings.machineHeight/2.0)*-1.0;
                       break;
                 case 3:
                       sysSettings.motorOffsetY = value;
-                      sysSettings.leftMotorY = sysSettings.motorOffsetY;
-                      sysSettings.rightMotorY = math.sin(sysSettings.topBeamTilt)*sysSettings.distBetweenMotors+sysSettings.motorOffsetY;
+                      sysSettings.leftMotorY = sin(sysSettings.topBeamTilt*0.0174532925199433)*distBetweenMotors/-2.0 + (sysSettings.motorOffsetY+sysSettings.machineHeight/2.0)*-1.0;
+                      sysSettings.rightMotorY = sin(sysSettings.topBeamTilt*0.0174532925199433)*distBetweenMotors/2.0 + (sysSettings.motorOffsetY+sysSettings.machineHeight/2.0)*-1.0;
                       break;
                 case 4:
                       sysSettings.sledWidth = value;
@@ -417,10 +417,10 @@ byte settingsStoreGlobalSetting(const byte& parameter,const float& value){
               sysSettings.sprocketRadius = value;
         case 44:
               sysSettings.topBeamTilt = value;
-              sysSettings.leftMotorX = math.cos(sysSettings.topBeamTilt)*sysSettings.distBetweenMotors/2.0;
-              sysSettings.leftMotorY = sysSettings.motorOffsetY;
-              sysSettings.rightMotorX = math.cos(sysSettings.topBeamTilt)*sysSettings.distBetweenMotors+sysSettings.leftMotorX;
-              sysSettings.rightMotorY = math.sin(sysSettings.topBeamTilt)*sysSettings.distBetweenMotors+sysSettings.motorOffsetY;
+              sysSettings.leftMotorX = cos(sysSettings.topBeamTilt*0.0174532925199433)*sysSettings.distBetweenMotors/-2.0;
+              sysSettings.leftMotorY = sin(sysSettings.topBeamTilt*0.0174532925199433)*distBetweenMotors/-2.0 + (sysSettings.motorOffsetY+sysSettings.machineHeight/2.0)*-1.0;
+              sysSettings.rightMotorX = cos(sysSettings.topBeamTilt*0.0174532925199433)*sysSettings.distBetweenMotors+sysSettings.leftMotorX;
+              sysSettings.rightMotorY = sin(sysSettings.topBeamTilt*0.0174532925199433)*distBetweenMotors/2.0 + (sysSettings.motorOffsetY+sysSettings.machineHeight/2.0)*-1.0;
         default:
               return(STATUS_INVALID_STATEMENT);
     }
