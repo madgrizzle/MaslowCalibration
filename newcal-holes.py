@@ -114,7 +114,7 @@ dH2M5 = 1070.0-101.0
 
 #optimization parameters.. this really does affect how well you can arrive at a solution and how good of a solution it is
 acceptableTolerance = .05
-numberOfIterations = 10000000
+numberOfIterations = 1000000
 motorYcoordCorrectionScale = 0.01
 motorXcoordCorrectionScale = 0.05
 chainSagCorrectionCorrectionScale = 0.01
@@ -256,11 +256,11 @@ while(errorMagnitude > acceptableTolerance and n < numberOfIterations):
 			bestRChainErrorHole4 = RChainErrorHole4
 
 			#report better findings
-			distBetweenMotors = math.sqrt( math.pow(leftMotorXEst-rightMotorXEst,2)+math.pow(leftMotorYEst-rightMotorYEst,2))
-			motorTilt = math.atan((rightMotorYEst-leftMotorYEst)/(rightMotorXEst-leftMotorXEst))*180.0/3.141592
+			distBetweenMotors = math.sqrt( math.pow(bestleftMotorXEst-bestrightMotorXEst,2)+math.pow(bestleftMotorYEst-bestrightMotorYEst,2))
+			motorTilt = math.atan((bestrightMotorYEst-bestleftMotorYEst)/(bestrightMotorXEst-bestleftMotorXEst))*180.0/3.141592
 			print "---------------------------------------------------------------------------------------------"
 			print "N: " + str(n) + ", Error Magnitude: " + str(round(bestErrorMagnitude, 3))
-			print "Motor Spacing: "+str(distBetweenMotors) + ", Motor Elevation: "+str(bestleftMotorYEst+(bestrightMotorYEst-bestleftMotorYEst)/2.0)+", Top Beam Tilt: "+str(motorTilt) +" degrees"
+			print "Motor Spacing: "+str(distBetweenMotors) + ", Motor Elevation: "+str((workspaceHeight/2.0+(bestleftMotorYEst+(bestrightMotorYEst-bestleftMotorYEst)/2.0))*-1.0)+", Top Beam Tilt: "+str(motorTilt) +" degrees"
 			tleftMotorX = math.cos(motorTilt*3.141592/180.0)*distBetweenMotors/-2.0 + (bestrightMotorXEst+bestleftMotorXEst)/2.0
 			tleftMotorY = math.sin(motorTilt*3.141592/180.0)*distBetweenMotors/-2.0 + bestleftMotorYEst + (bestrightMotorYEst-bestleftMotorYEst)/2.0
 			trightMotorX = math.cos(motorTilt*3.141592/180.0)*distBetweenMotors+tleftMotorX
@@ -340,9 +340,24 @@ while(errorMagnitude > acceptableTolerance and n < numberOfIterations):
 
 print "---------------------------------------------------------------------------------------------"
 if n == numberOfIterations:
-	print "Machine parameters could no solve to your desired tolerance, but did you really expect to be able to?"
+	print "Machine parameters could no solve to your desired tolerance, but hopefully it got close."
 else:
 	print "Solved!"
+
+print "Parameters for new GC"
+print "--Maslow Settings Tab--"
+distBetweenMotors = math.sqrt( math.pow(bestleftMotorXEst-bestrightMotorXEst,2)+math.pow(bestleftMotorYEst-bestrightMotorYEst,2))
+print "Distance Between Motors: "+str(distBetweenMotors)
+print "Motor Offset Height in mm: "+str((workspaceHeight/2.0+(bestleftMotorYEst+(bestrightMotorYEst-bestleftMotorYEst)/2.0))*-1.0)
+print "--Advanced Settings Tab--"
+print "Chain Tolerance, Left Chain: "+str(round(bestleftChainToleranceEst,7))
+print "Chain Tolerance, Right Chain: "+str(round(bestrightChainToleranceEst,7))
+motorTilt = math.atan((bestrightMotorYEst-bestleftMotorYEst)/(bestrightMotorXEst-bestleftMotorXEst))*180.0/3.141592
+print "Top Beam Tilt: "+str(round(motorTilt,7))
+print "Rotation Radius for Triangular Kinematics: " + str(round(bestrotationRadiusEst, 4))
+print "Chain Sag Correction Value for Triangular Kinematics: " + str(round(bestchainSagCorrectionEst, 6))
+
+
 print "---------------------------------------------------------------------------------------------"
 
 x="n"
