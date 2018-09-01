@@ -200,7 +200,7 @@ settings = {
                 "title": "Chain Tolerance, Left Chain",
                 "desc": "The tolerance adjustment for the left chain length, in percent",
                 "key": "leftChainTolerance",
-                "default": 1
+                "default": 1,
                 "firmwareKey": 40
             },
             {
@@ -208,7 +208,7 @@ settings = {
                 "title": "Chain Tolerance, Right Chain",
                 "desc": "The tolerance adjustment for the right chain length, in percent",
                 "key": "rightChainTolerance",
-                "default": 1
+                "default": 1,
                 "firmwareKey": 41
             },
             {
@@ -216,7 +216,7 @@ settings = {
                 "title": "Top Beam Tilt",
                 "desc": "The tilt of the top beam, in degrees",
                 "key": "topBeamTilt",
-                "default": 0
+                "default": 0,
                 "firmwareKey": 44
             },
             {
